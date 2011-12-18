@@ -17,11 +17,11 @@ Tweetly.js will authenticate on the first run:
 
     $ tweet
     
-    Launch your browser and point it to:
+    Now launching your browser and pointing it to:
 
     https://api.twitter.com/oauth/authorize?oauth_token=SJwXLWJIXXXXXXXXXXX
 
-    Then return here, paste the pin number, and hit enter.
+    When you finish, return here, paste the pin number, and hit enter.
 
 Once you do that, it'll save your oauth token in `~/.tweetlykey`.
 

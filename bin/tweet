@@ -1,5 +1,12 @@
 #!/usr/bin/env node
 
+var twitter = require('ntwitter'),
+    oauth = require('oauth'),
+    querystring = require('querystring'),
+    fs = require('fs'),
+    path = require('path'),
+    exec = require('child_process').exec;
+
 var request_token_url = 'https://api.twitter.com/oauth/request_token',
     access_token_url = 'https://api.twitter.com/oauth/access_token',
     authorize_url = 'https://api.twitter.com/oauth/authorize';
@@ -9,12 +16,6 @@ var CONSUMER_KEY = "7yE8GpWpUlp2dHcEvOlzQ",
         'base64').toString('ascii');
 
 var KEY_PATH = path.normalize(path.join(process.env.HOME, ".tweetlykey"));
-
-var twitter = require('ntwitter'),
-    oauth = require('oauth'),
-    querystring = require('querystring'),
-    fs = require('fs')
-    path = require('path');
 
 var oauth = new oauth.OAuth(
   request_token_url,
@@ -57,6 +58,10 @@ var saveCredentials = function(access_token_key, access_token_secret) {
 };
 
 var authenticateApp = function(oauth_token, oauth_token_secret, pin) {
+  if (pin.length <= 0) {
+    console.log('Crap');
+    return;
+  }
   oauth.getOAuthAccessToken(oauth_token, oauth_token_secret, pin,
     function(error, access_token_key, access_token_secret, params) {
       if (error) {
@@ -74,10 +79,18 @@ var authorizeApp = function() {
       if (error) {
         console.log(error);
       } else {
-        console.log("\n");
-        console.log("Launch your browser and point it to:\n");
-        console.log(authorize_url + '?' + querystring.stringify({oauth_token: oauth_token}) + "\n");
-        console.log("Then return here, paste the pin number, and hit enter.");
+        var authUrl = authorize_url + '?' + querystring.stringify({oauth_token: oauth_token});
+        console.log();
+        if (process.platform == 'darwin') {
+          console.log("Now launching your browser and pointing it to:\n");
+          console.log(authUrl + "\n");
+          console.log("When you finish, return here, paste the pin number, and hit enter.");
+          exec('open ' + "'" + authUrl + "'");
+        } else {
+          console.log("Launch your browser and point it to:\n");
+          console.log(authUrl + "\n");
+          console.log("Then return here, paste the pin number, and hit enter.");
+        }
         
         var stdin = process.openStdin();
         stdin.on('data', function(chunk) {
@@ -90,10 +103,8 @@ var authorizeApp = function() {
 };
 
 var readConfigFile = function() {
-  fs.stat(KEY_PATH, function(err, stats) {
-    if (err) {
-        authorizeApp();
-    } else {
+  path.exists(KEY_PATH, function(exists) {
+    if (exists) {
       fs.readFile(KEY_PATH, 'ascii', function(err, data) {
         if (err) {
           console.error("Could not open file: %s", err);
@@ -104,6 +115,8 @@ var readConfigFile = function() {
           }
         }
       });
+    } else {
+      authorizeApp();
     }
   });
 };
