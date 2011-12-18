@@ -73,9 +73,10 @@ var authorizeApp = function() {
       if (error) {
         console.log(error);
       } else {
+        console.log("\n");
         console.log("Launch your browser and point it to:\n");
         console.log(authorize_url + '?' + querystring.stringify({oauth_token: oauth_token}) + "\n");
-        console.log("Then return here and enter the pin");
+        console.log("Then return here, paste the pin number, and hit enter.");
         
         var stdin = process.openStdin();
         stdin.on('data', function(chunk) {
