@@ -1,0 +1,113 @@
+#!/usr/bin/env node
+
+var request_token_url = 'https://api.twitter.com/oauth/request_token',
+    access_token_url = 'https://api.twitter.com/oauth/access_token',
+    authorize_url = 'https://api.twitter.com/oauth/authorize';
+
+var CONSUMER_KEY = "7yE8GpWpUlp2dHcEvOlzQ",
+    CONSUMER_SECRET = new Buffer("UEYzdk9YcFcxaUp4ajJqd2FsQjhRZFdyZzN4R3plaWsxcllVZG1BMA==",
+        'base64').toString('ascii');
+
+var KEY_PATH = "./.tweetlykey";
+
+var twitter = require('ntwitter'),
+    oauth = require('oauth'),
+    querystring = require('querystring'),
+    fs = require('fs');
+
+var oauth = new oauth.OAuth(
+  request_token_url,
+  access_token_url,
+  CONSUMER_KEY,
+  CONSUMER_SECRET,
+  '1.0', null, 'HMAC-SHA1', null);
+
+var tweet = function(twit) {
+  if (process.argv.length == 3) {
+    twit.updateStatus(process.argv[2], function (err, data) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Tweeted: " + process.argv[2]);
+      }
+    });
+  }
+};
+
+var initUser = function(access_token_key, access_token_secret) {
+  var twit = new twitter({
+    consumer_key: CONSUMER_KEY,
+    consumer_secret: CONSUMER_SECRET,
+    access_token_key: access_token_key,
+    access_token_secret: access_token_secret
+  });
+  
+  tweet(twit);
+};
+
+var saveCredentials = function(access_token_key, access_token_secret) {
+  fs.writeFile(KEY_PATH, access_token_key + "\n" + access_token_secret, function(err) {
+    if(err) {
+        console.log(err);
+    } else {
+        initUser(access_token_key, access_token_secret);
+    }
+  });
+};
+
+var authenticateApp = function(oauth_token, oauth_token_secret, pin) {
+  oauth.getOAuthAccessToken(oauth_token, oauth_token_secret, pin,
+    function(error, access_token_key, access_token_secret, params) {
+      if (error) {
+        console.log(error);
+      } else {
+        saveCredentials(access_token_key, access_token_secret);
+      }
+    }
+  );
+};
+
+var authorizeApp = function() {
+  oauth.getOAuthRequestToken(
+    function(error, oauth_token, oauth_token_secret, oauth_authorize_url, params) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Launch your browser and point it to:\n");
+        console.log(authorize_url + '?' + querystring.stringify({oauth_token: oauth_token}) + "\n");
+        console.log("Then return here and enter the pin");
+        
+        var stdin = process.openStdin();
+        stdin.on('data', function(chunk) {
+          authenticateApp(oauth_token, oauth_token_secret, chunk.toString().trim());
+          stdin.destroy();
+        });
+      }
+    }
+  );
+};
+
+var readConfigFile = function() {
+  fs.stat(KEY_PATH, function(err, stats) {
+    if (err) {
+        authorizeApp();
+    } else {
+      fs.readFile(KEY_PATH, 'ascii', function(err, data) {
+        if (err) {
+          console.error("Could not open file: %s", err);
+        } else {
+          var arr = data.split("\n");
+          if (arr.length == 2) {
+            initUser(arr[0], arr[1]);
+          }
+        }
+      });
+    }
+  });
+};
+
+var startApp = function() {
+  readConfigFile();
+};
+
+startApp();
