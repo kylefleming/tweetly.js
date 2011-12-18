@@ -10,6 +10,6 @@
   },
   "bin"           : { "tweet": "./bin/tweet" },
   "directories"   : { "bin": "./bin" },
-  "version"       : "0.1.0",
+  "version"       : "0.1.1",
   "engines"       : {"node": ">=0.6.x"}
 }
