@@ -8,12 +8,13 @@ var CONSUMER_KEY = "7yE8GpWpUlp2dHcEvOlzQ",
     CONSUMER_SECRET = new Buffer("UEYzdk9YcFcxaUp4ajJqd2FsQjhRZFdyZzN4R3plaWsxcllVZG1BMA==",
         'base64').toString('ascii');
 
-var KEY_PATH = "./.tweetlykey";
+var KEY_PATH = path.normalize(path.join(process.env.HOME, ".tweetlykey"));
 
 var twitter = require('ntwitter'),
     oauth = require('oauth'),
     querystring = require('querystring'),
-    fs = require('fs');
+    fs = require('fs')
+    path = require('path');
 
 var oauth = new oauth.OAuth(
   request_token_url,

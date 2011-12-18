@@ -23,7 +23,7 @@ Tweetly.js will authenticate on the first run:
 
     Then return here, paste the pin number, and hit enter.
 
-Once you do that, it'll save your oauth token in `./.tweetlykey`.
+Once you do that, it'll save your oauth token in `~/.tweetlykey`.
 
 
 Usage
@@ -38,7 +38,7 @@ Tweet using the following format:
 Authenticate With a New User
 ----------------------------
 
-Simply remove `./.tweetlykey` and run tweetly.js again.
+Simply remove `~/.tweetlykey` and run tweetly.js again.
 
-    $ rm .tweetlykey
+    $ rm ~/.tweetlykey
     $ tweet
