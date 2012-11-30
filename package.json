@@ -6,7 +6,8 @@
   "keywords"      : ["twitter", "tweet"],
   "dependencies"  : {
     "ntwitter": ">=0.2.x",
-    "oauth": ">=0.8.x"
+    "oauth": ">=0.8.x",
+    "browser-token-machine": "0.1.0"
   },
   "bin"           : { "tweet": "./bin/tweet" },
   "directories"   : { "bin": "./bin" },

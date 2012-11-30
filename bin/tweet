@@ -5,7 +5,8 @@ var twitter = require('ntwitter'),
     querystring = require('querystring'),
     fs = require('fs'),
     path = require('path'),
-    exec = require('child_process').exec;
+    exec = require('child_process').exec
+    tokenMachine = require('browser-token-machine');
 
 var request_token_url = 'https://api.twitter.com/oauth/request_token',
     access_token_url = 'https://api.twitter.com/oauth/access_token',
@@ -80,22 +81,10 @@ var authorizeApp = function() {
         console.log(error);
       } else {
         var authUrl = authorize_url + '?' + querystring.stringify({oauth_token: oauth_token});
-        console.log();
-        if (process.platform == 'darwin') {
-          console.log("Now launching your browser and pointing it to:\n");
-          console.log(authUrl + "\n");
-          console.log("When you finish, return here, paste the pin number, and hit enter.");
-          exec('open ' + "'" + authUrl + "'");
-        } else {
-          console.log("Launch your browser and point it to:\n");
-          console.log(authUrl + "\n");
-          console.log("Then return here, paste the pin number, and hit enter.");
-        }
-        
-        var stdin = process.openStdin();
-        stdin.on('data', function(chunk) {
+        var extras = "Now launching your browser and pointing it to:" + '\n' + authUrl;
+        var question = "When you finish, return here, paste the pin number, and hit enter." + '\n';
+        tokenMachine(authUrl, question, extras, function(chunk) {
           authenticateApp(oauth_token, oauth_token_secret, chunk.toString().trim());
-          stdin.destroy();
         });
       }
     }
