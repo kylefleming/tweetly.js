@@ -92,7 +92,7 @@ var authorizeApp = function() {
 };
 
 var readConfigFile = function() {
-  path.exists(KEY_PATH, function(exists) {
+  fs.exists(KEY_PATH, function(exists) {
     if (exists) {
       fs.readFile(KEY_PATH, 'ascii', function(err, data) {
         if (err) {
